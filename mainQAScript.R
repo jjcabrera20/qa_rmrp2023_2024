@@ -23,8 +23,5 @@ if(nrow(df_completeness) > 0){
   write_xlsx(df_completeness,paste(BASE_PATH,paste("Admin1NoCompliant_",POPULATION_PROJECTION_COUNTRY_FILE),sep="/"))
 }
 df_population_country <- naToZero(df_population_country)
-
-
 sapply(df_population_country, class)
-
 
