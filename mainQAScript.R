@@ -1,3 +1,4 @@
+library(dplyr)
 library(readxl)
 library(writexl)
 source("QA_functions.R")
@@ -23,4 +24,10 @@ if(nrow(df_completeness) > 0){
   write_xlsx(df_completeness,paste(BASE_PATH,paste("Admin1NoCompliant_",POPULATION_PROJECTION_COUNTRY_FILE),sep="/"))
 }
 df_population_country <- naToZero(df_population_country)
-sapply(df_population_country, class)
+
+#Get columns with numeric data
+numCols_pop_country<-names(df_population_country)[sapply(df_population_country, is.numeric)]
+
+numData_pop_country<- df_population_country %>% select(all_of(numCols_pop_country))
+
+IsRound_numData_pop_country <- data.frame(lapply( numData_pop_country, function(x) {floor(x)==x}))

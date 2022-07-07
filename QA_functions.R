@@ -1,6 +1,7 @@
-library(tidyverse)
 library(dplyr)
-library(tidyr)
+#library(tidyr)
+#library(tidyverse)
+
 checkNumberOfRecords <- function(template, countrydata, joinFields){
   anti_join_a = anti_join(template, countrydata, joinFields)
   anti_join_b = anti_join(countrydata, template, joinFields)
@@ -9,10 +10,11 @@ checkNumberOfRecords <- function(template, countrydata, joinFields){
 }
 
 naToZero <- function (x) {
-  return(mutate_all(x,~replace_na(.,0)))
+  return(x %>% replace(is.na(.), 0))
 }
 
-isWholeNumber <- function(x) {
-  x= select_if(x , is.numeric)
-  return(all(floor(x)==x))
-}
+isWholeNumber <- function(x) {floor(x)==x}
+
+# isWholeNumber <- function(x) {
+#   return(all(floor(x)==x))
+# }
