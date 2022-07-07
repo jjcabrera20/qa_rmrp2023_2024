@@ -24,7 +24,6 @@ df_population_country = filter(df_population_country, df_population_country$Coun
 df_completeness = checkNumberOfRecords(df_population_template,df_population_country, c("Platform", "Country", "Admin 1"))
 if(nrow(df_completeness) > 0){
   print("Data not compliant with template, check Platform, Country and Admin1 names")
-  # TODO FALTA o SOBRA en una sola columna
   write_xlsx(df_completeness,paste(BASE_PATH,paste("Admin1NoCompliant_",POPULATION_PROJECTION_COUNTRY_FILE),sep="/"))
 }
 df_population_country <- naToZero(df_population_country)

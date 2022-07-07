@@ -1,5 +1,6 @@
 library(dplyr)
 
+# QA Functions ----
 
 checkNumberOfRecords <- function(template, countrydata, joinFields){
   anti_join_a = anti_join(template, countrydata, joinFields)
