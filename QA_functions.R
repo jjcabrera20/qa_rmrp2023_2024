@@ -13,7 +13,7 @@ naToZero <- function (x) {
   return(x %>% replace(is.na(.), 0))
 }
 
-isWholeNumber <- function(x) {floor(x)==x}
+isWholeNumber <- function(x) {ifelse(floor(x)==x,"","Review")}
 
 # isWholeNumber <- function(x) {
 #   return(all(floor(x)==x))

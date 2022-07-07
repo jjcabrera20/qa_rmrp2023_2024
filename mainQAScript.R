@@ -30,4 +30,4 @@ numCols_pop_country<-names(df_population_country)[sapply(df_population_country, 
 
 numData_pop_country<- df_population_country %>% select(all_of(numCols_pop_country))
 
-IsRound_numData_pop_country <- data.frame(lapply( numData_pop_country, function(x) {floor(x)==x}))
+IsRound_numData_pop_country <- data.frame(lapply( numData_pop_country, isWholeNumber))
