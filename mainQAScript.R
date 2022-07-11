@@ -1,3 +1,4 @@
+rm(list = ls())
 library(dplyr)
 library(readxl)
 library(writexl)
@@ -16,9 +17,9 @@ df_population_template = filter(df_population_template, df_population_template$C
 # Import excel files population projections files
 POPULATION_PROJECTION_COUNTRY_PATH = paste(BASE_PATH, POPULATION_PROJECTION_COUNTRY_FILE, sep = "/")
 df_population_country = read_excel(POPULATION_PROJECTION_COUNTRY_PATH)
-
+df_population_country = dplyr::mutate(df_population_country, ID = row_number())
 # INTEGRITY ----
-a<-checkFieldsCompliantWithTemplate(df_population_template, df_population_country)
+integrityCheck<-checkFieldsCompliantWithTemplate(df_population_template, df_population_country)
 
 # COMPLETENESS ---- 
 df_population_country = filter(df_population_country, df_population_country$Country==COUNTRY)
@@ -29,10 +30,39 @@ if(nrow(df_completeness) > 0){
 }
 df_population_country <- naToZero(df_population_country)
 
-# CONSISTENCY ----
+# CONFORMITY ----
 #Get columns with numeric data
 numCols_pop_country<-names(df_population_country)[sapply(df_population_country, is.numeric)]
 
 numData_pop_country<- df_population_country %>% select(all_of(numCols_pop_country))
 
 IsRound_numData_pop_country <- data.frame(lapply( numData_pop_country, isWholeNumber))
+
+# CONSISTENCY ----
+# Horizontal in destination
+Total2023InDestination <- select(numData_pop_country, c("ID",
+                                                        "Girls  In Destination",
+                                                        "Boys In Destination",
+                                                        "Women In Destination",
+                                                        "Men In Destination",
+                                                        "Total 2023 In Destination"))%>%
+  rowwise()%>%
+  mutate(SUMXX = `Girls  In Destination`+
+           `Boys In Destination`+
+           `Women In Destination`+
+           `Men In Destination`) %>% ungroup() %>%
+  mutate(TotalInDestinationSum = ifelse(SUMXX == `Total 2023 In Destination`, "", "Review"))
+# Horizontal host community
+Total2023HostComunity <- select(numData_pop_country, c("ID",
+                                                       "Girls  Host Community",
+                                                       "Boys Host Community",
+                                                       "Women Host Community",
+                                                       "Men Host Community",
+                                                       "Total 2023 Host Community"))%>%
+  rowwise()%>%
+  mutate(SUMXX = `Girls  Host Community`+
+           `Boys Host Community`+
+           `Women Host Community`+
+           `Men Host Community`+
+           `Total 2023 Host Community`) %>% ungroup() %>%
+  mutate(TotalInDestinationSum = ifelse(SUMXX == `Total 2023 Host Community`, "", "Review"))

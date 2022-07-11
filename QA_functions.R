@@ -32,9 +32,11 @@ checkFieldsCompliantWithTemplate <- function(template, countryData){
 #' checkRecordsCompliancy(df_population_template,df_population_country,
 #' c("Platform", "Country", "Admin 1"))
 checkRecordsCompliancy <- function(template, countryData, joinFields){
-  anti_join_a = anti_join(template, countryData, joinFields)
+  template = template %>% select(joinFields)
+  countryData = countryData %>% select(joinFields)
+  anti_join_a = anti_join(template, countryData, all_of(joinFields))
   anti_join_a['Status'] <- "Admin1 missing from template"
-  anti_join_b = anti_join(countryData, template, joinFields)
+  anti_join_b = anti_join(countryData, template, all_of(joinFields))
   anti_join_b['Status'] <- "Category not found in template, check spelling"
   reportFields = append(joinFields, 'Status')
   no_match = rbind(anti_join_a,anti_join_b)
