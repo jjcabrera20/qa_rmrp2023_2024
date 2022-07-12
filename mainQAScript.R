@@ -1,4 +1,5 @@
 rm(list = ls())
+library(tidyr)
 library(dplyr)
 library(readxl)
 library(writexl)
@@ -39,7 +40,7 @@ numData_pop_country<- df_population_country %>% select(all_of(numCols_pop_countr
 IsRound_numData_pop_country <- data.frame(lapply( numData_pop_country, isWholeNumber))
 
 # CONSISTENCY ----
-# Horizontal in destination
+# Horizontal in destination ----
 Total2023InDestination <- select(numData_pop_country, c("ID",
                                                         "Girls  In Destination",
                                                         "Boys In Destination",
@@ -47,12 +48,13 @@ Total2023InDestination <- select(numData_pop_country, c("ID",
                                                         "Men In Destination",
                                                         "Total 2023 In Destination"))%>%
   rowwise()%>%
-  mutate(SUMXX = `Girls  In Destination`+
+  mutate(SUMXX = `Girls  In Destination` +
            `Boys In Destination`+
            `Women In Destination`+
            `Men In Destination`) %>% ungroup() %>%
-  mutate(TotalInDestinationSum = ifelse(SUMXX == `Total 2023 In Destination`, "", "Review"))
-# Horizontal host community
+  mutate(TotalInDestinationSum = ifelse(SUMXX == `Total 2023 In Destination`, "", "Review"))%>%
+  select(TotalInDestinationSum)
+# Horizontal host community ----
 Total2023HostComunity <- select(numData_pop_country, c("ID",
                                                        "Girls  Host Community",
                                                        "Boys Host Community",
@@ -63,6 +65,15 @@ Total2023HostComunity <- select(numData_pop_country, c("ID",
   mutate(SUMXX = `Girls  Host Community`+
            `Boys Host Community`+
            `Women Host Community`+
-           `Men Host Community`+
-           `Total 2023 Host Community`) %>% ungroup() %>%
-  mutate(TotalInDestinationSum = ifelse(SUMXX == `Total 2023 Host Community`, "", "Review"))
+           `Men Host Community`) %>% ungroup() %>%
+  mutate(TotalInHostCommunitySum = ifelse(SUMXX == `Total 2023 Host Community`, "", "Review"))%>%
+  select(TotalInHostCommunitySum)
+
+# Vertical in destination ----
+
+df_verticalTest <- df_population_country %>% rowwise()%>% mutate(Admin0 = ifelse(`Admin 1` == 'Country level', "Country level",`Country` ))
+test_a <- df_verticalTest %>% group_by(Admin0) %>%  summarise(Freq = sum(`Dec 2022 Population projection In Destination`))
+aa <- test_a %>% spread(Admin0, Freq) 
+#bb <- aa %>% rowwise() %>% mutate(checkXX = `Country level` - `Ecuador`) %>% ungroup()
+bb <- aa %>% rowwise() %>% mutate(checkXX = ifelse(`Country level` == as.name(COUNTRY),"OK","Review"))
+
