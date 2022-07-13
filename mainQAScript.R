@@ -41,12 +41,14 @@ IsRound_numData_pop_country <- data.frame(lapply( numData_pop_country, isWholeNu
 
 # CONSISTENCY ----
 # Horizontal in destination ----
-Total2023InDestination <- select(numData_pop_country, c("ID",
-                                                        "Girls  In Destination",
-                                                        "Boys In Destination",
-                                                        "Women In Destination",
-                                                        "Men In Destination",
-                                                        "Total 2023 In Destination"))%>%
+IN_DESTINATION_FIELDS = c("ID",
+                          "Girls  In Destination",
+                          "Boys In Destination",
+                          "Women In Destination",
+                          "Men In Destination",
+                          "Total 2023 In Destination")
+
+Total2023InDestination <- select(numData_pop_country, IN_DESTINATION_FIELDS )%>%
   rowwise()%>%
   mutate(SUMXX = `Girls  In Destination` +
            `Boys In Destination`+
@@ -55,12 +57,13 @@ Total2023InDestination <- select(numData_pop_country, c("ID",
   mutate(TotalInDestinationSum = ifelse(SUMXX == `Total 2023 In Destination`, "", "Review"))%>%
   select(TotalInDestinationSum)
 # Horizontal host community ----
-Total2023HostComunity <- select(numData_pop_country, c("ID",
-                                                       "Girls  Host Community",
-                                                       "Boys Host Community",
-                                                       "Women Host Community",
-                                                       "Men Host Community",
-                                                       "Total 2023 Host Community"))%>%
+HOST_COMMUNITY_FIELDS = c("ID",
+                          "Girls  Host Community",
+                          "Boys Host Community",
+                          "Women Host Community",
+                          "Men Host Community",
+                          "Total 2023 Host Community")
+Total2023HostComunity <- select(numData_pop_country, HOST_COMMUNITY_FIELDS )%>%
   rowwise()%>%
   mutate(SUMXX = `Girls  Host Community`+
            `Boys Host Community`+
@@ -71,9 +74,18 @@ Total2023HostComunity <- select(numData_pop_country, c("ID",
 
 # Vertical in destination ----
 
-df_verticalTest <- df_population_country %>% rowwise()%>% mutate(Admin0 = ifelse(`Admin 1` == 'Country level', "Country level",`Country` ))
-test_a <- df_verticalTest %>% group_by(Admin0) %>%  summarise(Freq = sum(`Dec 2022 Population projection In Destination`))
-aa <- test_a %>% spread(Admin0, Freq) 
-#bb <- aa %>% rowwise() %>% mutate(checkXX = `Country level` - `Ecuador`) %>% ungroup()
-bb <- aa %>% rowwise() %>% mutate(checkXX = ifelse(`Country level` == as.name(COUNTRY),"OK","Review"))
+df_verticalTest <- df_population_country %>% rowwise()%>% mutate(Admin0 = ifelse(`Admin 1` == 'Country level', "Country level",`Country` )) %>% ungroup()
+
+# Vertical Dec 2022 in Destination ----
+
+summary_DEC2022Destination <- df_verticalTest %>% group_by(Admin0) %>%  summarise(Freq = sum(`Dec 2022 Population projection In Destination`)) %>% ungroup() %>%
+  spread(Admin0, Freq) %>% mutate_if(is.numeric, round, digits=3) %>% ungroup() %>%
+rowwise() %>% mutate(checkXX = ifelse(`Country level` == as.name(COUNTRY),"OK","Review")) %>% ungroup() %>%
+gather(key="year", value = "val", -checkXX)
+
+# Vertical Dec 2023 in Destination ----
+summary_DEC2023Destination <- df_verticalTest %>% group_by(Admin0) %>%  summarise(Freq = sum(`Total 2023 In Destination`)) %>% ungroup() %>%
+  spread(Admin0, Freq) %>% mutate_if(is.numeric, round, digits=3) %>% ungroup() %>%
+  rowwise() %>% mutate(checkXX = ifelse(`Country level` == as.name(COUNTRY),"OK","Review")) %>% ungroup() %>%
+  gather(key="year", value = "val", -checkXX)
 
