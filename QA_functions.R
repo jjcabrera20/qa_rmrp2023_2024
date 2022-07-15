@@ -67,3 +67,9 @@ naToZero <- function (x) {
 #' IsRound_numData_pop_country <- data.frame(lapply( numData_pop_country, isWholeNumber))
 isWholeNumber <- function(x) {ifelse(floor(x)==x,"","Review")}
 
+write.excel <- function(x,row.names=FALSE,col.names=TRUE,...) {
+  write.table(x,"clipboard",sep="\t",row.names=row.names,col.names=col.names,...)
+}
+
+
+
